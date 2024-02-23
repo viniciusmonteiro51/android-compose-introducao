@@ -1,8 +1,6 @@
 package com.br.vini.compose.ui.theme
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -20,12 +17,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,21 +28,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Gray
-import androidx.compose.ui.graphics.Color.Companion.Green
-import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.br.vini.compose.R
+import com.br.vini.compose.viewModel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavHostController) {
+
     var email by remember {mutableStateOf("")}
-    var password by remember {mutableStateOf("")}
+    var senha by remember {mutableStateOf("")}
+    val showAlert = remember { mutableStateOf(false) }
+
+    val viewModel = viewModel<AuthViewModel>()
+
     Surface(
         color = Color.LightGray,
         modifier = Modifier
@@ -85,10 +87,12 @@ fun LoginScreen() {
                         unfocusedBorderColor = Black,
                         cursorColor = Black
                     ),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done,keyboardType = KeyboardType.Email)
                 )
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = {password = it},
+                    value = senha,
+                    onValueChange = {senha = it},
                     label = {Text (
                         "Coloque sua senha",
                         style = TextStyle(
@@ -101,11 +105,24 @@ fun LoginScreen() {
                         unfocusedBorderColor = Black,
                         cursorColor = Black
                     ),
+                    singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done,keyboardType = KeyboardType.Password)
                 )
             Button(
-                onClick = { },
+                onClick = {
+
+                    viewModel.login(
+                              email,
+                              senha,
+                              onSucess = {
+                                  navController.navigate("minha-conta")
+                              },
+                              onError = {
+                                
+                              }
+                          )
+                },
                 Modifier
                     .fillMaxWidth()
                     .padding(top = 30.dp)
@@ -120,15 +137,9 @@ fun LoginScreen() {
                     text = "Entrar",
                     color = Color.White)
             }
-
-            }
         }
+
     }
-
-
-
-@Preview
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen()
 }
+
+
