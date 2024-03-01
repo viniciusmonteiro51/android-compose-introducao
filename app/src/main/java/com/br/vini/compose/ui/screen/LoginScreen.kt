@@ -46,11 +46,10 @@ import com.br.vini.compose.viewModel.AuthViewModel
 @Composable
 fun LoginScreen(navController: NavHostController) {
 
-    val authViewModel= hiltViewModel<AuthViewModel>()
+    val authViewModel = hiltViewModel<AuthViewModel>()
     var user by remember {mutableStateOf("")}
     var senha by remember {mutableStateOf("")}
-
-    val viewModel = viewModel<AuthViewModel>()
+    var error by remember { mutableStateOf("") }
 
     Surface(
         color = Color.LightGray,
@@ -75,6 +74,9 @@ fun LoginScreen(navController: NavHostController) {
                     .padding(top = 130.dp, bottom = 130.dp)
                     .size(200.dp)
             )
+            if(error.isNotEmpty()) {
+                Text(text = error)
+            }
                 OutlinedTextField(
                     value = user ,
                     onValueChange = {user = it},
@@ -112,14 +114,16 @@ fun LoginScreen(navController: NavHostController) {
                 )
             Button(
                 onClick = {
-                    viewModel.login(
+                    error = ""
+
+                   authViewModel.login(
                               user,
                               senha,
                               onSucess = {
                                   navController.navigate("minha-conta")
                               },
-                              onError = {
-                                
+                              onError = { message ->
+                                  error = message
                               }
                           )
                 },

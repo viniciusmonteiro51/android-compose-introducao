@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.br.vini.compose.R
@@ -41,7 +42,7 @@ import androidx.compose.material3.Text as Text
 
 @Composable
 fun MinhaContaScreen(navController: NavHostController) {
-    val viewModel = viewModel<AuthViewModel>()
+    val viewModel = hiltViewModel<AuthViewModel>()
     val showAlert = remember { mutableStateOf(false) }
     Surface(
     modifier = Modifier.fillMaxSize(),

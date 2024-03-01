@@ -2,6 +2,7 @@ package com.br.vini.compose.viewModel
 
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.br.vini.compose.datastore.AppDataStore
@@ -23,12 +24,12 @@ class AuthViewModel @Inject constructor(
         onError:(String) -> Unit
     ) {
 
-        if(user.isNotEmpty()) {
+        if(user.isEmpty()) {
             onError("Informe o usuário")
             return
         }
 
-        if(senha.isNotEmpty()) {
+        if(senha.isEmpty()) {
             onError("Informe a senha")
             return
         }
