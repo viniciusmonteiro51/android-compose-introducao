@@ -1,4 +1,4 @@
-package com.br.vini.compose.ui.theme
+package com.br.vini.compose.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

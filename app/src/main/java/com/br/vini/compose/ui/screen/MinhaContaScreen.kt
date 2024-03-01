@@ -1,4 +1,4 @@
-package com.br.vini.compose.ui.theme
+package com.br.vini.compose.ui.screen
 
 
 import androidx.compose.foundation.Image
@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,9 +39,7 @@ import com.br.vini.compose.viewModel.AuthViewModel
 import androidx.compose.material3.Text as Text
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun MinhaContaScreen(navController: NavHostController) {
     val viewModel = viewModel<AuthViewModel>()
     val showAlert = remember { mutableStateOf(false) }
@@ -77,10 +78,7 @@ fun MinhaContaScreen(navController: NavHostController) {
                         .size(50.dp)
                         .align(Alignment.BottomEnd)
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.edit_button),
-                        contentDescription = "Botão de Edição"
-                    )
+                    Icon(Icons.Default.Create, contentDescription = "ícone de lupa")
                 }
 
             }
@@ -119,7 +117,7 @@ fun MinhaContaScreen(navController: NavHostController) {
                         onClick = {
                             showAlert.value = true
                             viewModel.logOut(
-                                onSucess = {
+                                onLogout = {
                                     navController.navigate("inicio")
                                 }
                             )
@@ -141,6 +139,7 @@ fun MinhaContaScreen(navController: NavHostController) {
         }
     }
 }
+
 
 
 

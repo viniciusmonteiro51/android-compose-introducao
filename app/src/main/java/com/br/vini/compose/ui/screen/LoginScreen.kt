@@ -1,4 +1,4 @@
-package com.br.vini.compose.ui.theme
+package com.br.vini.compose.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -45,9 +46,9 @@ import com.br.vini.compose.viewModel.AuthViewModel
 @Composable
 fun LoginScreen(navController: NavHostController) {
 
-    var email by remember {mutableStateOf("")}
+    val authViewModel= hiltViewModel<AuthViewModel>()
+    var user by remember {mutableStateOf("")}
     var senha by remember {mutableStateOf("")}
-    val showAlert = remember { mutableStateOf(false) }
 
     val viewModel = viewModel<AuthViewModel>()
 
@@ -75,10 +76,10 @@ fun LoginScreen(navController: NavHostController) {
                     .size(200.dp)
             )
                 OutlinedTextField(
-                    value = email ,
-                    onValueChange = {email = it},
+                    value = user ,
+                    onValueChange = {user = it},
                     label = { Text(
-                        "E-mail", style = TextStyle(
+                        "Usuário", style = TextStyle(
                             color = Black
                         ))},
                     modifier = Modifier.fillMaxWidth(),
@@ -94,7 +95,7 @@ fun LoginScreen(navController: NavHostController) {
                     value = senha,
                     onValueChange = {senha = it},
                     label = {Text (
-                        "Coloque sua senha",
+                        "Senha",
                         style = TextStyle(
                             color = Black))},
                     modifier = Modifier
@@ -111,9 +112,8 @@ fun LoginScreen(navController: NavHostController) {
                 )
             Button(
                 onClick = {
-
                     viewModel.login(
-                              email,
+                              user,
                               senha,
                               onSucess = {
                                   navController.navigate("minha-conta")
