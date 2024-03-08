@@ -42,7 +42,7 @@ import androidx.compose.material3.Text as Text
 
 @Composable
 fun MinhaContaScreen(navController: NavHostController) {
-    val viewModel = hiltViewModel<AuthViewModel>()
+    val authViewModel = hiltViewModel<AuthViewModel>()
     val showAlert = remember { mutableStateOf(false) }
     Surface(
     modifier = Modifier.fillMaxSize(),
@@ -103,6 +103,9 @@ fun MinhaContaScreen(navController: NavHostController) {
             ) { Text(text = "Sair") }
         }
 
+        if(authViewModel.loading.value) {
+            LoadingScreen()
+        }
         if (showAlert.value) {
             AlertDialog(onDismissRequest = {
                 showAlert.value = false
@@ -116,8 +119,8 @@ fun MinhaContaScreen(navController: NavHostController) {
                 confirmButton = {
                     Button(
                         onClick = {
-                            showAlert.value = true
-                            viewModel.logOut(
+                            showAlert.value = false
+                            authViewModel.logOut(
                                 onLogout = {
                                     navController.navigate("inicio")
                                 }

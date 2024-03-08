@@ -33,11 +33,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.br.vini.compose.R
 import com.br.vini.compose.viewModel.AuthViewModel
@@ -115,7 +112,6 @@ fun LoginScreen(navController: NavHostController) {
             Button(
                 onClick = {
                     error = ""
-
                    authViewModel.login(
                               user,
                               senha,
@@ -142,8 +138,11 @@ fun LoginScreen(navController: NavHostController) {
                     color = Color.White)
             }
         }
-
+        if(authViewModel.loading.value) {
+            LoadingScreen()
+        }
     }
+
 }
 
 
