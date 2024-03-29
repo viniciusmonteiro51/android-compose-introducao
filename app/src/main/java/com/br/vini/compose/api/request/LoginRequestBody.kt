@@ -1,6 +1,6 @@
 package com.br.vini.compose.api.request
 
-class LoginRequestBody (
+data class LoginRequestBody (
     var email: String = "",
-    var senha: String = "",
+    var senha: String = ""
 )

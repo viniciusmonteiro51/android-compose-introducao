@@ -17,4 +17,10 @@ class AppDataStore @Inject constructor(
             preferences[key] = value
         }
     }
+
+    suspend fun putString(key: Preferences.Key<String>, value: String) {
+        dataStore.edit { preferences ->
+            preferences[key] = value
+        }
+    }
 }
