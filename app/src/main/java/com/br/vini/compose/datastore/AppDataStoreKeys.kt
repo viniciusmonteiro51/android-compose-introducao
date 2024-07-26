@@ -6,5 +6,5 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 object AppDataStoreKeys {
 
     val AUTENTICADO = booleanPreferencesKey("autenticado")
-    val NOME = stringPreferencesKey("nome")
+    val TOKEN = stringPreferencesKey("token")
 }

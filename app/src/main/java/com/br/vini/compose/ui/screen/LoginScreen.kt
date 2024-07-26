@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.br.vini.compose.R
+import com.br.vini.compose.api.ApiState
 import com.br.vini.compose.viewModel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,9 +46,11 @@ import com.br.vini.compose.viewModel.AuthViewModel
 fun LoginScreen(navController: NavHostController) {
 
     val authViewModel = hiltViewModel<AuthViewModel>()
-    var user by remember {mutableStateOf("")}
+    val loginState by authViewModel.loginResponseBody
+
+    var usuario by remember {mutableStateOf("")}
     var senha by remember {mutableStateOf("")}
-    var error by remember { mutableStateOf("") }
+    var passwordVisibility by remember { mutableStateOf(false) }
 
     Surface(
         color = Color.LightGray,
@@ -71,12 +75,32 @@ fun LoginScreen(navController: NavHostController) {
                     .padding(top = 130.dp, bottom = 130.dp)
                     .size(200.dp)
             )
-            if(error.isNotEmpty()) {
-                Text(text = error)
+
+            when(loginState) {
+                is ApiState.Created -> {}
+                is ApiState.Loading -> {}
+                is ApiState.Success -> {
+                    //redireciona
+                }
+                is ApiState.Error -> {
+                    loginState.message?.let { message ->
+                        Text(
+                            message,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp),
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Red
+                            )
+                        )
+                    }
+                }
             }
+
                 OutlinedTextField(
-                    value = user ,
-                    onValueChange = {user = it},
+                    value = usuario ,
+                    onValueChange = {usuario = it},
                     label = { Text(
                         "Usuário", style = TextStyle(
                             color = Black
@@ -111,16 +135,9 @@ fun LoginScreen(navController: NavHostController) {
                 )
             Button(
                 onClick = {
-                    error = ""
                    authViewModel.login(
-                              user,
-                              senha,
-                              onSucess = {
-                                  navController.navigate("minha-conta")
-                              },
-                              onError = { message ->
-                                  error = message
-                              }
+                              usuario,
+                              senha
                           )
                 },
                 Modifier
@@ -138,9 +155,7 @@ fun LoginScreen(navController: NavHostController) {
                     color = Color.White)
             }
         }
-        if(authViewModel.loading.value) {
-            LoadingScreen()
-        }
+
     }
 
 }

@@ -103,9 +103,6 @@ fun MinhaContaScreen(navController: NavHostController) {
             ) { Text(text = "Sair") }
         }
 
-        if(authViewModel.loading.value) {
-            LoadingScreen()
-        }
         if (showAlert.value) {
             AlertDialog(onDismissRequest = {
                 showAlert.value = false
@@ -120,11 +117,6 @@ fun MinhaContaScreen(navController: NavHostController) {
                     Button(
                         onClick = {
                             showAlert.value = false
-                            authViewModel.logOut(
-                                onLogout = {
-                                    navController.navigate("inicio")
-                                }
-                            )
                         }
                     ) {
                         Text(text = "Sair")
