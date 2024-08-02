@@ -14,6 +14,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,23 +32,28 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.br.vini.compose.R
+import com.br.vini.compose.api.ApiState
 import com.br.vini.compose.viewModel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavHostController) {
 
-    val authViewModel = hiltViewModel<AuthViewModel>()
-    var user by remember {mutableStateOf("")}
-    var senha by remember {mutableStateOf("")}
-    var error by remember { mutableStateOf("") }
+    val authViewModel = viewModel<AuthViewModel>()
+    val loginState by authViewModel.loginResponseBody
+
+    var email by remember { mutableStateOf("alx.delira@gmail.com") }
+    var senha by remember { mutableStateOf("12345678") }
+    var passwordVisibility by remember { mutableStateOf(false) }
 
     Surface(
         color = Color.LightGray,
@@ -71,12 +78,30 @@ fun LoginScreen(navController: NavHostController) {
                     .padding(top = 130.dp, bottom = 130.dp)
                     .size(200.dp)
             )
-            if(error.isNotEmpty()) {
-                Text(text = error)
-            }
+                when(loginState) {
+                    is ApiState.Created -> {}
+                    is ApiState.Loading -> {}
+                    is ApiState.Success -> {
+                        navController.navigate("usuario")
+                    }
+                    is ApiState.Error -> {
+                        loginState.message?.let { message ->
+                            Text(
+                                message,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Red
+                                )
+                            )
+                        }
+                    }
+                }
                 OutlinedTextField(
-                    value = user ,
-                    onValueChange = {user = it},
+                    value = email ,
+                    onValueChange = {email = it},
                     label = { Text(
                         "Usuário", style = TextStyle(
                             color = Black
@@ -93,10 +118,22 @@ fun LoginScreen(navController: NavHostController) {
                 OutlinedTextField(
                     value = senha,
                     onValueChange = {senha = it},
-                    label = {Text (
-                        "Senha",
+                    label = {Text ("Senha",
                         style = TextStyle(
-                            color = Black))},
+                            color = Black))
+                            },
+                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            passwordVisibility = !passwordVisibility
+                        }) {
+                            val id = if (passwordVisibility) R.drawable.ic_visibility_off else R.drawable.ic_visibility_on
+                            Icon(
+                                painter = painterResource(id = id),
+                                contentDescription = null
+                            )
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 10.dp),
@@ -106,22 +143,14 @@ fun LoginScreen(navController: NavHostController) {
                         cursorColor = Black
                     ),
                     singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done,keyboardType = KeyboardType.Password)
                 )
             Button(
                 onClick = {
-                    error = ""
-                   authViewModel.login(
-                              user,
-                              senha,
-                              onSucess = {
-                                  navController.navigate("minha-conta")
-                              },
-                              onError = { message ->
-                                  error = message
-                              }
-                          )
+                    authViewModel.login(
+                        email,
+                        senha
+                    )
                 },
                 Modifier
                     .fillMaxWidth()

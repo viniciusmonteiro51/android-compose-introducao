@@ -1,116 +1,71 @@
 package com.br.vini.compose.viewModel
 
-
-import androidx.compose.runtime.getValue
+import android.app.Application
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.br.vini.compose.api.ApiEndpoint
+import com.br.vini.compose.api.ApiRepository
+import com.br.vini.compose.api.ApiState
 import com.br.vini.compose.api.request.LoginRequestBody
 import com.br.vini.compose.api.response.LoginResponseBody
-import com.br.vini.compose.api.response.UsuariosResponseBody
 import com.br.vini.compose.datastore.AppDataStore
 import com.br.vini.compose.datastore.AppDataStoreKeys
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 
-@HiltViewModel
-class AuthViewModel @Inject constructor(
-    private val appDataStore: AppDataStore
-) : ViewModel() {
-    var autenticado = mutableStateOf(false)
+
+/*
+Classe responsável por representar o modelo de visualização.
+Ela contém os dados necessários para construir a interface do usuário.
+Lembre-se que o ViewModel sobrevive as alterações de configuração, como a rotação da tela.
+Desta forma o estado da interface não é perdido em caso de alterações de configuração.
+É no ViewModel que vamos acessar os dados da API e repassá-los para a interface.
+ */
+
+class AuthViewModel(
+    private val application: Application
+) : AndroidViewModel(application) {
+    private val apiRepository = ApiRepository()
+    private val _loginResponseBody = mutableStateOf<ApiState<LoginResponseBody>>(ApiState.Created())
+    val loginResponseBody: State<ApiState<LoginResponseBody>> = _loginResponseBody
     val loading = mutableStateOf(false)
 
     fun login(
-        user: String,
-        senha: String,
-        onSucess: () -> Unit,
-        onError: (String) -> Unit
+        email: String,
+        senha: String
     ) {
-
-        if (user.isEmpty()) {
-            onError("Informe o usuário")
+        if (email.isBlank()) {
+            _loginResponseBody.value = ApiState.Error("Informe o usuário")
             return
         }
 
-        if (senha.isEmpty()) {
-            onError("Informe a senha")
+        if (senha.isBlank()) {
+            _loginResponseBody.value = ApiState.Error("Informe a senha")
             return
         }
 
         val requestBody = LoginRequestBody()
-        requestBody.email = user
+        requestBody.email = email
         requestBody.senha = senha
 
-        val retrofit = Retrofit.Builder()
-            .client(OkHttpClient.Builder().build())
-            .baseUrl("https://api-estudos.vercel.app")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val endpoint = retrofit.create(Endpoint::class.java)
+        _loginResponseBody.value = ApiState.Loading()
 
         viewModelScope.launch {
-            loading.value = true
-
-            val callback = endpoint.login(requestBody)
-
-            callback.enqueue(object : Callback<LoginResponseBody> {
-                override fun onFailure(call: Call<LoginResponseBody>, t: Throwable) {
-                    if (t.message.isNullOrBlank()) {
-                        onError("No fail message avaliable")
-                    } else {
-                        onError(t.message!!)
+            _loginResponseBody.value = apiRepository.login(requestBody)
+            if (_loginResponseBody.value is ApiState.Success) {
+                loading.value = true
+                /*
+                Salva dados do usuário
+                 */
+                _loginResponseBody.value.data?.let { data ->
+                    runBlocking {
+                        val appDataStore = AppDataStore(application.applicationContext)
+                        appDataStore.putBoolean(AppDataStoreKeys.AUTENTICADO, true)
+                        appDataStore.putString(AppDataStoreKeys.TOKEN, data.token)
                     }
                 }
-                    override fun onResponse(call: Call<LoginResponseBody>, response: Response<LoginResponseBody>) {
-                        onSucess()
-
-                        if (response.isSuccessful) {
-                            println(response.body()!!.usuario.nome)
-                            println(response.body()!!.token)
-                        } else {
-
-                        }
-                    }
-
-            })
-
-            appDataStore.putBoolean(AppDataStoreKeys.AUTENTICADO, true).apply {
-                onSucess()
             }
         }
     }
-
-    fun logOut(
-        onLogout: () -> Unit
-    ) {
-        viewModelScope.launch {
-            loading.value = true
-            delay(2000)
-            appDataStore.putBoolean(AppDataStoreKeys.AUTENTICADO, false).apply {
-                onLogout()
-            }
-        }
-    }
-
-}
-
-interface Endpoint {
-    @POST("/login")
-    fun login(@Body requestBody: LoginRequestBody) : Call<LoginResponseBody>
 }

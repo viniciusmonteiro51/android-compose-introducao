@@ -15,9 +15,9 @@ import com.br.vini.compose.ui.theme.ComposeIntroducaoTheme
 import com.br.vini.compose.ui.screen.InicioScreen
 import com.br.vini.compose.ui.screen.LoginScreen
 import com.br.vini.compose.ui.screen.MinhaContaScreen
-import dagger.hilt.android.AndroidEntryPoint
+import com.br.vini.compose.ui.screen.UsuariosScreen
 
-@AndroidEntryPoint
+
 class MainActivity : ComponentActivity() {
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +38,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("inicio"){
                             InicioScreen(navController)
+                        }
+                        composable("usuarios") {
+                            UsuariosScreen(navController)
                         }
                     }
                 }

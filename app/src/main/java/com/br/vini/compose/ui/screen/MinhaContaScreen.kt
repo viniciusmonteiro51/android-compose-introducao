@@ -30,9 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.br.vini.compose.R
@@ -42,7 +40,7 @@ import androidx.compose.material3.Text as Text
 
 @Composable
 fun MinhaContaScreen(navController: NavHostController) {
-    val authViewModel = hiltViewModel<AuthViewModel>()
+    val authViewModel = viewModel<AuthViewModel>()
     val showAlert = remember { mutableStateOf(false) }
     Surface(
     modifier = Modifier.fillMaxSize(),
@@ -102,10 +100,6 @@ fun MinhaContaScreen(navController: NavHostController) {
                 modifier = Modifier.padding(top = 24.dp)
             ) { Text(text = "Sair") }
         }
-
-        if(authViewModel.loading.value) {
-            LoadingScreen()
-        }
         if (showAlert.value) {
             AlertDialog(onDismissRequest = {
                 showAlert.value = false
@@ -118,14 +112,7 @@ fun MinhaContaScreen(navController: NavHostController) {
                 },
                 confirmButton = {
                     Button(
-                        onClick = {
-                            showAlert.value = false
-                            authViewModel.logOut(
-                                onLogout = {
-                                    navController.navigate("inicio")
-                                }
-                            )
-                        }
+                        onClick = { /*TODO*/}
                     ) {
                         Text(text = "Sair")
                     }
