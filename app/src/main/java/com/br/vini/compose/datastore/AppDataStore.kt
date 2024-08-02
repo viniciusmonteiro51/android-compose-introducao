@@ -16,26 +16,28 @@ class AppDataStore(
     private val context: Context
 ) {
 
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(SETTINGS)
+    companion object {
+        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(SETTINGS)
+    }
 
     private val dataStore: DataStore<Preferences> = PreferenceDataStoreFactory.create(
         produceFile = { context.preferencesDataStoreFile(SETTINGS) }
     )
 
     suspend fun putBoolean(key: Preferences.Key<Boolean>, value: Boolean) {
-        dataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             preferences[key] = value
         }
     }
 
     fun getBoolean(key: Preferences.Key<Boolean>): Flow<Boolean> {
-        return dataStore.data.map { preferences ->
+        return context.dataStore.data.map { preferences ->
             preferences[key] ?: false
         }
     }
 
     suspend fun putString(key: Preferences.Key<String>, value: String) {
-        dataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             preferences[key] = value
         }
     }

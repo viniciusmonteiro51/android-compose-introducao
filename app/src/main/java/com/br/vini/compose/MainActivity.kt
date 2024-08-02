@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
                         composable("inicio"){
                             InicioScreen(navController)
                         }
-                        composable("usuarios") {
+                        composable("usuario") {
                             UsuariosScreen(navController)
                         }
                     }
