@@ -49,7 +49,7 @@ fun UsuariosScreen(
                                     Box(
                                         modifier = Modifier
                                             .clickable {
-                                                navController.navigate("usuario")
+                                                navController.navigate("editar-usuario/${usuario._id}")
                                             }
                                             .padding(20.dp)
                                             .fillMaxWidth()

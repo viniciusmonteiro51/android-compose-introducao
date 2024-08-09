@@ -2,42 +2,38 @@ package com.br.vini.compose.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.datastore.preferences.preferencesDataStoreFile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-
 const val SETTINGS = "settings"
+
+// Extensão do Context para obter o DataStore como um singleton
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = SETTINGS)
+
 class AppDataStore(
     private val context: Context
 ) {
 
-    companion object {
-        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(SETTINGS)
-    }
-
-    private val dataStore: DataStore<Preferences> = PreferenceDataStoreFactory.create(
-        produceFile = { context.preferencesDataStoreFile(SETTINGS) }
-    )
+    // Use a instância singleton do DataStore
+    private val dataStore: DataStore<Preferences> = context.dataStore
 
     suspend fun putBoolean(key: Preferences.Key<Boolean>, value: Boolean) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[key] = value
         }
     }
 
     fun getBoolean(key: Preferences.Key<Boolean>): Flow<Boolean> {
-        return context.dataStore.data.map { preferences ->
+        return dataStore.data.map { preferences ->
             preferences[key] ?: false
         }
     }
 
     suspend fun putString(key: Preferences.Key<String>, value: String) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[key] = value
         }
     }

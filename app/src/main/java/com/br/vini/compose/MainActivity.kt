@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.br.vini.compose.ui.screen.EditarUsuario
 import com.br.vini.compose.ui.theme.ComposeIntroducaoTheme
 import com.br.vini.compose.ui.screen.InicioScreen
 import com.br.vini.compose.ui.screen.LoginScreen
@@ -41,6 +42,12 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("usuario") {
                             UsuariosScreen(navController)
+                        }
+                        composable("editar-usuario/{id}") { backStackEntry ->
+                            val aId = backStackEntry.arguments?.getString("id")
+                            aId?.let { id ->
+                                EditarUsuario(id, navController)
+                            }
                         }
                     }
                 }
